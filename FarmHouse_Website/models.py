@@ -23,11 +23,19 @@ class Reviews(models.Model):
     bookingId = models.ForeignKey(Bookings, on_delete=models.PROTECT)
     reviewDate = models.DateField()
     rating = models.IntegerField()
+    reviewContent = models.TextField(default="")
 
 class ReviewsMedia(models.Model):
     mediaId = models.AutoField(primary_key=True)
     reviewId = models.ForeignKey(Reviews, on_delete=models.CASCADE)
     mediaType = models.CharField(max_length=20)
     media = models.BinaryField()
+
+class Menu(models.Model):
+    dishId = models.AutoField(primary_key=True)
+    dishName = models.CharField(max_length=50)
+    dishDescription = models.TextField()
+    dishPrice = models.IntegerField()
+    dishImage = models.BinaryField()
 
 
