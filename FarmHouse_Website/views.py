@@ -6,3 +6,5 @@ from rest_framework import status
 class Home(APIView):
     def get(self,request):
         return Response({'key':'value'}, content_type="application/json")
+
+
