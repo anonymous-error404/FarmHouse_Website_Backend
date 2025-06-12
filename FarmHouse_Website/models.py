@@ -16,7 +16,7 @@ class Bookings(models.Model):
     totalGuestsChildren = models.IntegerField(default=0)
     IDtype = models.CharField(max_length=30) #type of id, eg adhaar, pan etx
     IDnumber = models.CharField(max_length=30, verbose_name="number on ID") #number on id, eg adhar number
-    IDimage = models.BinaryField()
+    IDimage = models.BinaryField(default=b'')
     purposeOfStay = models.CharField(max_length=50)
 
 class Reviews(models.Model):
