@@ -11,10 +11,23 @@ class Bookings(models.Model):
     guestName = models.TextField()
     guestEmail = models.CharField(max_length=50)
     guestPhone = models.CharField(max_length=15)
+    guestAddress = models.TextField()
     totalGuestsAdults = models.IntegerField(default=0)
     totalGuestsChildren = models.IntegerField(default=0)
     IDtype = models.CharField(max_length=30) #type of id, eg adhaar, pan etx
     IDnumber = models.CharField(max_length=30, verbose_name="number on ID") #number on id, eg adhar number
     purposeOfStay = models.CharField(max_length=50)
+
+class Reviews(models.Model):
+    reviewId = models.AutoField(primary_key=True)
+    bookingId = models.ForeignKey(Bookings, on_delete=models.PROTECT)
+    reviewDate = models.DateField()
+    rating = models.IntegerField()
+
+class ReviewsMedia(models.Model):
+    mediaId = models.AutoField(primary_key=True)
+    reviewId = models.ForeignKey(Reviews, on_delete=models.CASCADE)
+    mediaType = models.CharField(max_length=20)
+    media = models.BinaryField()
 
 
