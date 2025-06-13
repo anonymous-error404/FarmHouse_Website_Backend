@@ -2,20 +2,19 @@ from datetime import date
 
 from django.test import TestCase
 from .models import *
-
-
-# Create your tests here.
+from .views import *
 
 class modelTests(TestCase):
 
-    def test_insertInto_reviewMedia(self):
+    @classmethod
+    def setUpTestData(cls):
 
         try:
 
             with open('C:/Users/Manas/OneDrive/画像/WhatsApp Image 2025-05-05 at 14.44.34_e80bf389.jpg', 'rb') as f:
                 image_data = f.read()
 
-            booking = Bookings.objects.create(
+            cls.booking = Bookings.objects.create(
                 bookingDate=date(2025, 6, 12),
                 checkInDate=date(2025, 6, 15),
                 checkOutDate=date(2025, 6, 20),
@@ -33,34 +32,28 @@ class modelTests(TestCase):
                 IDimage=image_data,
                 purposeOfStay="Vacation"
             )
-            print(booking)
-        except Exception as e:
-            print("Something went wrong ", e)
 
-    def test_insertInto_Review(self):
+            print(cls.booking)
 
-        try:
-            review = Reviews.objects.create(
-                bookingId=1,
+            cls.review = Reviews.objects.create(
+                bookingId=Bookings.objects.get(pk=1),
                 reviewDate=date(2025, 6, 21),
                 rating=4,
                 reviewContent="Great stay, friendly staff!"
             )
-            print(review)
-        except Exception as e:
-            print("Something went wrong ", e)
+            print(cls.review)
 
-    def test_insertInto_ReviewMedia(self):
-
-        try:
-            with open('C:/Users/Manas/OneDrive/画像/WhatsApp Image 2025-05-05 at 14.44.34_e80bf389.jpg', 'rb') as f:
-                image_data = f.read()
-
-            reviewMedia = ReviewsMedia.objects.create(
-                reviewId=100,
+            cls.reviewMedia = ReviewsMedia.objects.create(
+                reviewId=Reviews.objects.get(pk=1),
                 mediaType="image",
                 media=image_data,
             )
-            print(reviewMedia)
+            print(cls.reviewMedia)
+
         except Exception as e:
             print("Something went wrong ", e)
+
+    def test_getBookingobjectTest(self):
+        booking = Bookings.objects.get(bookingId=1)
+        print(booking.bookingDate)
+
