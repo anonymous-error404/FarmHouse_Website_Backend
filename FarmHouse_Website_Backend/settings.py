@@ -129,3 +129,10 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ]
 }
+
+
+def MAX_UPLOAD_SIZE():
+    return 10485760
+
+def PATH_TO_FFMPEG():
+    return "C:/ffmpeg/ffmpeg-2025-06-11-git-f019dd69f0-essentials_build/bin/ffmpeg.exe"

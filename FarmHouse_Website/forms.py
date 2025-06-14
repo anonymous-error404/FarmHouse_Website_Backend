@@ -1,10 +1,12 @@
 from django import forms
 
+from FarmHouse_Website import compressor
 from FarmHouse_Website.models import Bookings
+from FarmHouse_Website_Backend import settings
 
 
 class BookingAdminForm(forms.ModelForm):
-    image = forms.ImageField(required=True)
+    binary_data = forms.FileField(required=True)
 
     class Meta:
         model = Bookings
@@ -12,9 +14,17 @@ class BookingAdminForm(forms.ModelForm):
 
     def save(self, commit=False):
         instance = super().save(commit=False)
-        uploaded_image = self.cleaned_data.get('image')
-        if uploaded_image:
-            instance.IDimage = uploaded_image.read()
+        uploaded_file = self.cleaned_data.get('binary_data')
+        uploaded_bytes = uploaded_file.read()
+
+        if uploaded_bytes:
+            if len(uploaded_bytes) >= settings.MAX_UPLOAD_SIZE():
+                if uploaded_file.name.endswith(".jpg"):
+                   uploaded_bytes = compressor.compressImageWithBestQuality(uploaded_bytes)
+                elif uploaded_file.name.endswith(".mp4"):
+                    uploaded_bytes = compressor.compressVideo(uploaded_bytes)
+
+            instance.IDimage = uploaded_bytes
             commit = True
         if commit:
             instance.save()

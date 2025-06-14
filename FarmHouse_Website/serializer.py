@@ -31,4 +31,4 @@ class BookingsSerializer(serializers.ModelSerializer):
         ]
 
     def get_IDimage(self,obj):
-        return base64.b64encode(obj.IDimage).decode("utf-8")
+        return f'<img src="data:image/jpeg;base64,{base64.b64encode(obj.IDimage).decode("utf-8")}>'
