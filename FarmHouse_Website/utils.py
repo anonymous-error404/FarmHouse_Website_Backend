@@ -58,5 +58,3 @@ def get_available_dates(start_date, end_date=None, days=30):
 
 # Sabse pehle wo database se sirf wo bookings nikalta hai jinka payment status confirm hai
 # Uske baad ye dekhta hai ke existing bookings kis date range ko block kar rahi hain, aur phir unke beech ke available dates return karta hai.
-
-

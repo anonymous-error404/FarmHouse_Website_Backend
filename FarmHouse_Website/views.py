@@ -1,10 +1,9 @@
 import base64
-
 from django.http import HttpResponse
+from rest_framework import viewsets
 from rest_framework.views import APIView
-
-
-from FarmHouse_Website.models import Bookings
+from FarmHouse_Website.models import *
+from FarmHouse_Website.serializer import *
 
 
 class Home(APIView):
@@ -21,3 +20,11 @@ class Home(APIView):
         """
 
         return HttpResponse(html, content_type='text/html')
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Bookings.objects.all()
+    serializer_class = BookingsSerializer
+
+class MenuViewSet(viewsets.ModelViewSet):
+    queryset = Menu.objects.all()
+    serializer_class = MenuSerializer
