@@ -1,7 +1,7 @@
 from django import forms
 
 from FarmHouse_Website import compressor
-from FarmHouse_Website.models import Bookings
+from FarmHouse_Website.models import *
 from FarmHouse_Website_Backend import settings
 
 
@@ -29,3 +29,25 @@ class BookingAdminForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+class MenuAdminForm(forms.ModelForm):
+    image = forms.ImageField(required=True)
+
+    class Meta:
+        model = Menu
+        fields = '__all__'
+
+    def save(self,commit = False):
+        instance = super().save(commit = False)
+        uploaded_file = self.cleaned_data.get('image')
+        uploaded_bytes = uploaded_file.read()
+        if uploaded_bytes:
+            if len(uploaded_bytes) >= settings.MAX_UPLOAD_SIZE():
+                uploaded_bytes = compressor.compressImageWithBestQuality(uploaded_bytes)
+
+            instance.dishImage = uploaded_bytes
+            commit = True
+        if commit:
+            instance.save()
+        return instance
+
