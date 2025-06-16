@@ -174,94 +174,40 @@ def generate_alternative_dates(check_in_date, check_out_date, duration):
     return alternatives
 
 
-def create_booking_with_validation(booking_data):
+def validate_booking_dates(check_in_date, check_out_date):
     """
-    Create a new booking with date validation and automatic field setting.
-    Returns (success: bool, data: dict, errors: dict)
-    """
-    from .serializer import BookingsSerializer
-    
-    # Set current date as booking date if not already set
-    if 'bookingDate' not in booking_data or booking_data['bookingDate'] is None:
-        booking_data['bookingDate'] = datetime.now().strftime('%Y-%m-%d')
-    
-    # Set default payment status to pending (0)
-    if 'paymentStatus' not in booking_data:
-        booking_data['paymentStatus'] = PAYMENT_STATUS_PENDING
-    
-    # Validate data with serializer
-    serializer = BookingsSerializer(data=booking_data)
-    
-    if not serializer.is_valid():
-        return False, None, serializer.errors
-    
-    # Extract requested dates and calculate duration
-    check_in_date = serializer.validated_data.get('checkInDate')
-    check_out_date = serializer.validated_data.get('checkOutDate')
-    duration = (check_out_date - check_in_date).days
-    
-    # Check for availability
-    is_available, _ = check_booking_availability(check_in_date, check_out_date)
-    
-    if not is_available:
-        alternatives = generate_alternative_dates(check_in_date, check_out_date, duration)
-        return False, {
-            'status': 'unavailable',
-            'message': 'The property is already booked for these dates.',
-            'alternative_dates': alternatives
-        }, None
-    
-    # Save the booking if dates are available
-    booking = serializer.save()
-    return True, serializer.data, None
-
-
-def update_booking_payment_status(booking_id, new_status):
-    """
-    Update a booking's payment status with validation.
-    Returns (success: bool, data: dict, error_message: str)
+    Validate booking dates for basic business rules.
+    Returns (is_valid: bool, error_message: str)
     """
     try:
-        booking = Bookings.objects.get(bookingId=booking_id)
-    except Bookings.DoesNotExist:
-        return False, None, 'Booking not found'
-    
-    # Validate payment status
-    try:
-        new_status = int(new_status)
+        if isinstance(check_in_date, str):
+            check_in_date = datetime.strptime(check_in_date, '%Y-%m-%d').date()
+        if isinstance(check_out_date, str):
+            check_out_date = datetime.strptime(check_out_date, '%Y-%m-%d').date()
     except (ValueError, TypeError):
-        return False, None, 'payment_status must be an integer'
+        return False, 'Invalid date format. Please use YYYY-MM-DD.'
     
-    if new_status not in [PAYMENT_STATUS_PENDING, PAYMENT_STATUS_PAID, PAYMENT_STATUS_APPROVED_UNPAID]:
-        return False, None, 'Invalid payment status. Use 0 for pending, 1 for paid, 2 for approved but unpaid'
+    today = datetime.now().date()
     
-    # If changing to approved status, check for availability (excluding current booking)
-    if new_status in CONFIRMED_PAYMENT_STATUSES and booking.paymentStatus not in CONFIRMED_PAYMENT_STATUSES:
-        is_available, _ = check_booking_availability(
-            booking.checkInDate, 
-            booking.checkOutDate, 
-            exclude_booking_id=booking.bookingId
-        )
-        
-        if not is_available:
-            duration = (booking.checkOutDate - booking.checkInDate).days
-            alternatives = generate_alternative_dates(booking.checkInDate, booking.checkOutDate, duration)
-            return False, {
-                'status': 'unavailable',
-                'message': 'The property is already booked for these dates.',
-                'alternative_dates': alternatives
-            }, None
+    # Check if check-in date is in the past
+    if check_in_date < today:
+        return False, 'Check-in date cannot be in the past.'
     
-    # Update payment status
-    booking.paymentStatus = new_status
-    booking.save()
+    # Check if check-out date is after check-in date
+    if check_out_date <= check_in_date:
+        return False, 'Check-out date must be after check-in date.'
     
-    return True, {
-        'status': 'success',
-        'message': f'Booking payment status updated to {new_status}',
-        'booking_id': booking.bookingId,
-        'payment_status': booking.paymentStatus
-    }, None
+    # Check if booking duration is reasonable (e.g., max 30 days)
+    duration = (check_out_date - check_in_date).days
+    if duration > 30:
+        return False, 'Maximum booking duration is 30 days.'
+    
+    # Check if booking is too far in the future (e.g., max 1 year ahead)
+    max_future_date = today + timedelta(days=365)
+    if check_in_date > max_future_date:
+        return False, 'Bookings can only be made up to 1 year in advance.'
+    
+    return True, None
 
 
 def get_availability_info(check_in_date, check_out_date):
