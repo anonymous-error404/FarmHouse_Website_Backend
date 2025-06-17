@@ -79,7 +79,7 @@ def check_booking_availability(check_in_date, check_out_date, exclude_booking_id
     
     conflicts = conflicts_query.order_by('checkInDate')
     
-    return not conflicts.exists(), conflicts
+    return conflicts.exists(), conflicts
 
 
 def generate_alternative_dates(check_in_date, check_out_date, duration):
@@ -207,7 +207,7 @@ def validate_booking_dates(check_in_date, check_out_date):
     if check_in_date > max_future_date:
         return False, 'Bookings can only be made up to 1 year in advance.'
     
-    return True, None
+    return True, 'Booking dates are valid'
 
 
 def get_availability_info(check_in_date, check_out_date):
