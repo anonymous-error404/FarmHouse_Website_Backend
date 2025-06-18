@@ -21,7 +21,7 @@ class Bookings(models.Model):
 
 class Reviews(models.Model):
     reviewId = models.AutoField(primary_key=True)
-    bookingId = models.ForeignKey(Bookings, on_delete=models.PROTECT)
+    bookingId = models.IntegerField()
     reviewDate = models.DateField()
     rating = models.IntegerField()
     reviewContent = models.TextField(default="")
@@ -29,6 +29,7 @@ class Reviews(models.Model):
 class ReviewsMedia(models.Model):
     mediaId = models.AutoField(primary_key=True)
     reviewId = models.ForeignKey(Reviews, on_delete=models.CASCADE)
+    mediaName = models.CharField(max_length=50, default="")
     mediaType = models.CharField(max_length=20)
     media = models.BinaryField()
 

@@ -1,14 +1,23 @@
 import base64
-from datetime import datetime
-
 from rest_framework import serializers
-
+from . import utils
 from FarmHouse_Website.models import *
 
 
+class EncodeWhileWriteOnly(serializers.Field):
+    def to_representation(self, value):
+        if value is not None:
+            return base64.b64encode(value).decode('utf-8') #used to create a string of b64 encoded binary data(media file) for safe wrapping into json
+        return None
+
+    def to_internal_value(self, value):
+        if value is not None:
+            return utils.get_encoded_media(value)
+        return None
+
+
 class BookingsSerializer(serializers.ModelSerializer):
-    IDimage = serializers.SerializerMethodField()
-    bookingDate = serializers.DateField(required=False)
+    IDimage = EncodeWhileWriteOnly()
 
     class Meta:
         model = Bookings
@@ -31,15 +40,11 @@ class BookingsSerializer(serializers.ModelSerializer):
             'IDimage',
             'purposeOfStay',
         ]
-        read_only_fields = ['bookingId']
+        write_only_fields = ['IDimage']
 
-    def get_IDimage(self, obj):
-        if obj.IDimage:
-            return base64.b64encode(obj.IDimage).decode("utf-8")
-        return None
 
 class MenuSerializer(serializers.ModelSerializer):
-    dishImage = serializers.SerializerMethodField()
+    dishImage = EncodeWhileWriteOnly()
 
     class Meta:
         model = Menu
@@ -51,7 +56,11 @@ class MenuSerializer(serializers.ModelSerializer):
             'dishImage',
         ]
 
-    def get_dishImage(self, obj):
-        if obj.dishImage:
-            return base64.b64encode(obj.dishImage).decode("utf-8")
-        return None
+class ReviewsSerializer(serializers.ModelSerializer):
+    reviewDate = serializers.DateField(required=False)
+
+    class Meta:
+        model = Reviews
+        fields = '__all__'
+
+
