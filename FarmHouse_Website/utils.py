@@ -1,10 +1,13 @@
 import base64
+import random
 from datetime import datetime, timedelta
+
+from django.core.mail import EmailMessage
 from django.db.models import Q
 from rest_framework.serializers import Serializer
 
 from FarmHouse_Website_Backend import settings
-from . import compressor
+from . import compressor, views
 from .models import Bookings, ReviewsMedia
 
 # Define payment status constants for clarity
@@ -298,3 +301,23 @@ def getMedia(review_id):
     finally:
         return media_list
 
+
+def sendOtpVerificationMail(receiver):
+    otp = random.randint(100000, 999999)
+
+    try:
+        print("Sending to:", [receiver])
+
+        email = EmailMessage(
+            subject="OTP Verification",
+            body=f"Your OTP is {otp}",
+            from_email=settings.EMAIL_HOST_USER,
+            to=[receiver]
+        )
+        if email.send(fail_silently=False) :
+            views.temporary_otp_storage.put(receiver,otp)
+            print("email sent with otp ", otp)
+            return True
+        return False
+    except Exception as e:
+        print(e)

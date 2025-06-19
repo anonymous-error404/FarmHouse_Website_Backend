@@ -18,6 +18,7 @@ class EncodeWhileWriteOnly(serializers.Field):
 
 class BookingsSerializer(serializers.ModelSerializer):
     IDimage = EncodeWhileWriteOnly()
+    bookingDate = serializers.DateField(required=False)
 
     class Meta:
         model = Bookings

@@ -1,13 +1,11 @@
-import base64
 from datetime import datetime
-
 from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from FarmHouse_Website.serializer import *
 
-
+temporary_otp_storage = {}
 class Home(APIView):
     def get(self, request):
         image_bin = Bookings.objects.get(bookingId=10).IDimage
@@ -23,6 +21,7 @@ class Home(APIView):
 
         return HttpResponse(html, content_type='text/html')
 
+#gotta create a new url mapping for otp verification and call the bookingviewset.create method after otp is verified
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Bookings.objects.all()
@@ -46,19 +45,22 @@ class BookingViewSet(viewsets.ModelViewSet):
                     if 'IDimage' not in serializer.validated_data:
                         return Response({'message': 'IDimage is required'}, status=status.HTTP_206_PARTIAL_CONTENT)
                     else:
-                        serializer.validated_data['bookingDate'] = datetime.today()
-                        serializer.save()
-                        return Response(status=status.HTTP_200_OK)
+                        receiver = serializer.validated_data['guestEmail']
+                        request.session['receiver'] = receiver
+                        if not utils.sendOtpVerificationMail(receiver) :
+                            return Response(status=status.HTTP_424_FAILED_DEPENDENCY)
+                        else :
+                            serializer.validated_data['bookingDate'] = datetime.today()
+                            serializer.save()
+                            return Response(status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         else:
             return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-
 class MenuViewSet(viewsets.ModelViewSet):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
-
 
 class ReviewsViewSet(viewsets.ModelViewSet):
     queryset = Reviews.objects.all()
@@ -69,7 +71,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
         if serializer.is_valid(raise_exception=True):
 
-            if not Bookings.objects.filter(bookingId=serializer.validated_data['bookingId']).exists() :
+            if not Bookings.objects.filter(bookingId=serializer.validated_data['bookingId']).exists():
                 return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
 
             try:
@@ -100,3 +102,6 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         review = serializer.data
         review['media_list'] = utils.getMedia(review['reviewId'])
         return Response(data=review, status=status.HTTP_200_OK)
+
+
+
