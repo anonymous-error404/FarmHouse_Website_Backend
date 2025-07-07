@@ -1,0 +1,78 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django-specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+db.sqlite3-journal
+
+# Django media/uploads (optional)
+media/
+uploads/
+
+# Environment variables
+.env
+.env.*
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# pipenv / poetry / virtualenv
+*.venv/
+venv/
+ENV/
+env/
+.Python
+
+# Migrations (optional — keep if needed in repo)
+**/migrations/*.py
+**/migrations/__pycache__/
+
+# Static files (optional if you're collecting static)
+staticfiles/
+static/
+static_root/
+collected_static/
+
+# MyPy / Coverage / Tests
+.mypy_cache/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Local settings
+local_settings.py
+
+# Node (if using frontend stuff in admin or templates)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build files
+dist/
+build/
+*.egg-info/
+
+# Docker
+*.pid
+*.sock
+docker-compose.override.yml
+
+# Gunicorn
+gunicorn.log
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
