@@ -1,7 +1,6 @@
 from datetime import datetime, date
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from FarmHouse_Website.serializer import *
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -53,17 +52,18 @@ class ReviewsViewSet(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
 
             try:
-                serializer.validated_data['bookingId'] = Bookings.objects.get(guestPhone=request.data['guestPhone']).bookingId
+                serializer.validated_data['bookingId'] = Bookings.objects.filter(guestPhone=request.data['guestPhone']).last().bookingId
                 serializer.validated_data['reviewDate'] = datetime.today()
                 saved_review = serializer.save()
-
+                
                 if utils.setMedia(media_list=request.FILES.getlist('media_list'),
-                                review=Reviews.objects.get(reviewId=saved_review.reviewId)):
+                    review=Reviews.objects.get(reviewId=saved_review.reviewId)):
                     return Response(status=status.HTTP_200_OK)
                 else:
                     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             except Exception as e:
                 print(e)
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -81,30 +81,3 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         review = serializer.data
         review['media_list'] = utils.getMedia(review['reviewId'])
         return Response(data=review, status=status.HTTP_200_OK)
-
-# class Authorization(APIView):
-    
-#     def get(self, request):
-#         email = request.data.get('guestEmail')
-#         if email:
-#             if Bookings.objects.filter(guestEmail=email).exists():
-#                 return Response(status=status.HTTP_100_CONTINUE)
-#             elif utils.sendOtpVerificationMail(receiver=email):
-#                 request.session['customerEmail'] = email
-#                 return Response(status=status.HTTP_200_OK)
-#             else:
-#                 return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-#     def post(self, request):
-#         customerEmail = request.session.get('customerEmail')
-#         otp = request.data.get('otp')
-
-#         if customerEmail and otp:
-#             if cache.get(customerEmail) == otp:
-#                 request.session['status'] = "verified"
-#                 cache.delete(customerEmail)
-#                 return Response(status=status.HTTP_200_OK)
-#             return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-#         return Response(status=status.HTTP_400_BAD_REQUEST)

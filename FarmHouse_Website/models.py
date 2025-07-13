@@ -36,7 +36,7 @@ class Menu(models.Model):
     dishName = models.CharField(max_length=50)
     dishDescription = models.TextField()
     dishPrice = models.IntegerField()
-    dishImage = models.BinaryField()
+    # dishImage = models.BinaryField()
     dishCategory = models.CharField(max_length=30, default="")
     dishSource = models.CharField(max_length=30, default="")
 
