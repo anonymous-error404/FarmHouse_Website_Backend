@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,7 +55,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "https://nimalfarm.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -82,8 +85,12 @@ WSGI_APPLICATION = 'FarmHouse_Website_Backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'manasdev$default',
+        'USER': 'manasdev',
+        'PASSWORD': 'Rajnikant@1',
+        'HOST': 'manasdev.mysql.pythonanywhere-services.com',
+        'PORT': '3306',
     }
 }
 
@@ -142,16 +149,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'guravmanas22@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_app_password')
+EMAIL_HOST_USER = 'nirmalfarmsbookingconfirmation@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('APP_PASSWORD')
 
 
 def MAX_UPLOAD_SIZE():
     return 10485760
-
-
-def PATH_TO_FFMPEG():
-    return "C:/ffmpeg/ffmpeg-2025-06-11-git-f019dd69f0-essentials_build/bin/ffmpeg.exe"
 
 
 

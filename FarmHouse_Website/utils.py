@@ -123,12 +123,12 @@ def getMedia(review_id):
         return media_list
 
 
-def sendConfirmationEmail(receiver, name, checkin, checkout):
+def sendConfirmationEmail(receiver, name, checkin, checkout, phone):
 
     try:
         print("Sending to:", receiver)
 
-        email = EmailMessage(
+        email1 = EmailMessage(
             subject="🏨 Booking Confirmation – Nirmal Farms",
             body=f""""Dear {name},
 
@@ -144,13 +144,24 @@ def sendConfirmationEmail(receiver, name, checkin, checkout):
 
                     Warm regards,
                     The Nirmal Farms Team
-                    📞 xxxxxxxxxxx
-                    📧 xxxxxxxxxxx""",
+                    📞 9870204394
+                    📞 9870204424""",
             from_email=settings.EMAIL_HOST_USER,
             to=[receiver]
         )
+
+        email2 = EmailMessage(
+            subject="🏨 New Booking Request - Nirmal Farms",
+            body=f""""Name : {name},
+                      gmail : {receiver},
+                      phone number : {phone},
+                      checkin date : {checkin},
+                      checkout dat e: {checkout}""",
+            from_email=settings.EMAIL_HOST_USER,
+            to=[settings.EMAIL_HOST_USER]
+        )
         
-        if email.send(fail_silently=False) :
+        if email1.send(fail_silently=False) and email2.send(fail_silently=False):
             print("email sent")
             return True
         

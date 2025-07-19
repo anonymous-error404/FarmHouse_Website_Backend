@@ -28,7 +28,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             serializer.validated_data['bookingDate'] = date.today()
             confirmed_booking = serializer.save()
             if  confirmed_booking :
-                if utils.sendConfirmationEmail(confirmed_booking.guestEmail,confirmed_booking.guestName ,confirmed_booking.checkInDate, confirmed_booking.checkOutDate) :
+                if utils.sendConfirmationEmail(confirmed_booking.guestEmail,confirmed_booking.guestName ,confirmed_booking.checkInDate, confirmed_booking.checkOutDate, confirmed_booking.guestPhone) :
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 else :
                     return Response("Error sending confirmation email", status = status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -25,4 +25,3 @@ def compressImageWithBestQuality(image_bytes, max_quality=95, min_quality=10):
             high = mid - 1
 
     return best_output
-
